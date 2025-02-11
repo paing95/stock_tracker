@@ -1,0 +1,40 @@
+{% extends 'stock/main.html' %}
+{% load static %}
+
+{% block title %}
+Stock Picker
+{% endblock %}
+
+{% block css %}
+<style>
+    .form-select {
+        height: 400px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Live Stock Tracker</h1>
+    <form action="/live">
+        {% csrf_token %}
+        <label for="stockpicker">Select Stocks:</label>
+        <select 
+            class="form-select form-select-lg mb-3" 
+            multiple aria-label="multiple select example"
+            name="stockpicker"
+        >
+            {% for company in companies %}
+                <option value="{{company.ticker}}">{{company.name}}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <div class="d-grid gap-2">
+            <input class="btn btn-primary" type="submit" value="Submit" />
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

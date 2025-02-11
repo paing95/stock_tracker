@@ -1,0 +1,67 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}
+Stock Tracker
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'stock/css/signup.css' %}" />
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="signup-form">
+        <h1 class="signup-title">Create Account</h1>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form action="/signup/" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Username" 
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            <div class="mb-3">
+                <input 
+                    type="email" 
+                    class="form-control" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Email" 
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            <div class="mb-4">
+                <input 
+                    type="password" 
+                    class="form-control" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Password" 
+                    required
+                >
+            </div>
+            <div class="mb-4 signup-text">
+                <p>Already have an account? Please login <a href="/">here</a>.</p>    
+            </div>
+            <input class="btn btn-primary signup-btn" type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

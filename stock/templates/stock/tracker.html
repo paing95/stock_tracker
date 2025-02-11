@@ -1,0 +1,114 @@
+{% extends 'stock/main.html' %}
+{% load static %}
+
+{% block title %}
+Stock Tracker
+{% endblock %}
+
+{% block css %}
+<style>
+    .green {
+        color: green !important;
+    }
+    .red {
+        color: red !important;
+    }
+    .table-container {
+        overflow-x: scroll;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Live Stock Tracker</h1>
+    <div class="table-container">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Prev Close</th>
+                <th scope="col">Open</th>
+                <th scope="col">Volume</th>
+                <th scope="col">Change</th>
+                <th scope="col">Change %</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                    <tr>
+                        <th class="ticker" scope="row">{{ forloop.counter }}</th>
+                        <td id="{{company.ticker}}__name" class="name">{{ company.name }} ({{ company.ticker }})</td>
+                        <td id="{{company.ticker}}__current_price" class="current_price">{{ company.current_price }}</td>
+                        <td id="{{company.ticker}}__prev_close" class="prev_close">{{ company.prev_close }}</td>
+                        <td id="{{company.ticker}}__open" class="open">{{ company.open }}</td>
+                        <td id="{{company.ticker}}__volume" class="volume">{{ company.volume }}</td>
+                        {% if company.change >= 0 %}
+                            <td id="{{company.ticker}}__change" class="change green">+{{ company.change }}</td>
+                        {% else %}
+                            <td id="{{company.ticker}}__change" class="change red">{{ company.change }}</td>
+                        {% endif %}
+                        {% if company.change_percentage >= 0 %}
+                            <td id="{{company.ticker}}__change_percentage" class="change_percentage green">+{{ company.change_percentage }}%</td>
+                        {% else %}
+                            <td id="{{company.ticker}}__change_percentage" class="change_percentage red">{{ company.change_percentage }}%</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{ room_name|json_script:"room-name" }}
+{% endblock %}
+
+{% block js %}
+<script>
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    console.log('Room Name:', roomName.name);
+    // if (!roomName) return;
+    var queryString = window.location.search;
+    queryString = queryString.substring(1);
+
+    const stockSocker = new WebSocket(
+        'ws://' + 
+        window.location.host + 
+        '/ws/stock/' +
+        roomName.name +
+        "/" + 
+        '?' + queryString
+    );
+    stockSocker.onmessage = function(e) {
+        console.log(e.data);
+        const data = JSON.parse(e.data);
+        console.log(data);
+
+        for(const [i, value] of Object.entries(data)) {
+            const key = value.ticker;
+            document.getElementById(key + '__current_price').innerHTML = value['current_price'];
+            document.getElementById(key + '__prev_close').innerHTML = value['prev_close'];
+            document.getElementById(key + '__open').innerHTML = value['open'];
+            document.getElementById(key + '__volume').innerHTML = value['volume'];
+            
+            if (value['change'] > 0) {
+                document.getElementById(key + '__change').className = 'change green';
+                document.getElementById(key + '__change').innerHTML = "+" + value['change'];
+            } else {
+                document.getElementById(key + '__change').className = 'change red';
+                document.getElementById(key + '__change').innerHTML = value['change'];
+            }
+
+            if (value['change_percentage'] > 0) {
+                document.getElementById(key + '__change_percentage').className = 'change_percentage green';
+                document.getElementById(key + '__change_percentage').innerHTML = "+" + value['change_percentage'] + "%";
+            } else {
+                document.getElementById(key + '__change_percentage').className = 'change red';
+                document.getElementById(key + '__change_percentage').innerHTML = value['change_percentage'] + "%";
+            }
+        }
+    }
+</script>
+{% endblock %}

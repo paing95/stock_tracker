@@ -1,0 +1,12 @@
+asyncio==3.4.3
+celery==5.4.0
+channels[daphne]==4.2.0
+channels_redis==4.2.1
+Django==5.1.5
+django-celery-beat==2.7.0
+django-celery-results==2.5.1
+django-simple-history==3.8.0
+PyMySQL==1.1.1
+redis==5.2.1
+selenium==4.28.1
+yfinance==0.2.52
